@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .hide{display: none}
+        .c1{
+            position: fixed;
+            top: 100px;
+            left:50%;
+            width: 400px;
+            height: 300px;
+            margin-left: -200px;
+            background-color: white;
+            z-index: 20;
+        }
+        .c2{
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            background-color: black;
+            opacity: 0.7;
+            z-index: 9;
+        }
+        .c4 {
+            padding: 7px 12px;
+            font-size: 12px;
+            border-radius: 3px;
+            display: inline-block;
+            border: 1px solid #dcdfe6;
+            color: #606266;
+            text-align: center;
+            font-weight: 500;
+            text-decoration: none;
+         }
+        .c4:hover{
+            background-color: #c6e2ff;
+            color: #409eff;
+            cursor: pointer;
+        }
+        .c5{
+            padding: 7px 12px;
+            font-size: 12px;
+            border-radius: 3px;
+            display: inline-block;
+            border: 1px solid #f78989;
+            color: white;
+            text-align: center;
+            font-weight: 500;
+            text-decoration: none;
+            background-color: #f66161;
+        }
+        .c5:hover{
+            background-color: #f78989;
+            cursor: pointer;
+        }
+        .c6 {
+            padding: 7px 12px;
+            font-size: 12px;
+            border-radius: 3px;
+            display: inline-block;
+            border: 1px solid #dcdfe6;
+            color: #606266;
+            text-align: center;
+            font-weight: 500;
+            text-decoration: none;
+         }
+        .c6:hover{
+            background-color: #c6e2ff;
+            color: #409eff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="d1" class="c2 hide"></div>
+    <div id="d2" class="c1 hide">
+        <form action="/test/" method="post">
+        <input class="hostname"  name="hostname" type="text" placeholder="主机名">
+        <br/>
+        <input class="ip" name="ip" type="text" placeholder="IP">
+        <br/>
+        <input class="port" name="port" type="text" placeholder="端口">
+        <br/>
+        <select name="sel">
+            {% for row in obj %}
+            <option value="{{ row.b_id }}">{{ row.b.caption }}</option>
+            {% endfor %}
+        </select>
+        <br/>
+        <input  type="submit" value="提交">
+        <a id="ajax_submit_1" style="background-color: blue;padding: 2px 0">悄悄提交</a>
+        <input class="i4" type="button" value="取消">
+        </form>
+    </div>
+    <div id="d3" class="c1 hide">
+        <form id="form_edit" action="/test_edit/" method="post">
+            <input class="id" name="id" type="text" style="display: none;" >
+            <input class="hostname"  name="hostname"  type="text" placeholder="主机名">
+            <br/>
+            <input class="ip" name="ip" type="text" placeholder="IP">
+            <br/>
+            <input class="port" name="port" type="text" placeholder="端口">
+            <br/>
+            <select id="sel" name="a">
+                {% for row in obj4 %}
+                <option value="{{ row.id}}">{{ row.caption }}</option>
+                {% endfor %}
+            </select>
+            <br/>
+            <a class="c6" id="ajax_submit_2" >确认编辑</a>
+            <input class="i4 c5" type="button" value="取消">
+        </form>
+    </div>
+    <h1>主机信息(对象)</h1>
+    <input id="i3" type="button" value="添加"/>
+    <table border="1px">
+        <thead>
+        <tr>
+            <th>序号</th>
+            <th>主机名</th>
+            <th>IP</th>
+            <th>端口</th>
+            <th>业务线</th>
+            <th>选项</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in obj %}
+        <tr  hid="{{ row.nid }}" bid="{{ row.b_id }}">
+            <td>{{ forloop.counter }}</td>
+            <td name="hostname">{{ row.hostname }}</td>
+            <td name="ip">{{ row.ip }}</td>
+            <td name="port">{{ row.port }}</td>
+            <td>{{ row.b.caption }}</td>
+            <td><a class="c4">编辑</a>|<a class="c5">删除</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <h1>主机信息（字典）</h1>
+    <table border="1px">
+        <thead>
+        <tr>
+            <th>主机名</th>
+            <th>IP</th>
+            <th>端口</th>
+            <th>业务线</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in obj2 %}
+        <tr>
+            <td>{{ row.hostname }}</td>
+            <td>{{ row.ip }}</td>
+            <td>{{ row.port }}</td>
+            <td>{{ row.b__caption }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <h1>主机信息（元组）</h1>
+    <table border="1px">
+        <thead>
+        <tr>
+            <th>主机名</th>
+            <th>IP</th>
+            <th>端口</th>
+            <th>业务线</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in obj3 %}
+        <tr>
+            <td>{{ row.0 }}</td>
+            <td>{{ row.1 }}</td>
+            <td>{{ row.2 }}</td>
+            <td>{{ row.3 }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <script src="/static/jquery-1.12.4.js"></script>
+    <script>
+        $('#i3').click(function () {
+            $('#d1,#d2').removeClass('hide')
+        });
+        $('.i4').click(function () {
+            $('#d1,#d2').addClass('hide')
+        });
+        $('#ajax_submit_1').click(function () {
+            $.ajax({
+                url:"/test_ajax/",
+                type:"POST",
+                data:{"hostname":$('#hostname').val(),"ip":$('#ip').val(),"port":$('#port').val()},
+                success:function (data) {
+                    if(data=='ok'){
+                        location.reload()
+                    }
+                }
+            })
+        });
+        $('.c5').click(function () {
+            $.ajax({
+                url:'/dele/',
+                type:'POST',
+                data:{'id':$(this).parent().parent().attr('hid')},
+                success:function (data) {
+                    if(data=='ok'){
+                        location.reload()
+                    }
+                }
+            });
+        });
+        $('.c4').click(function () {
+            $('#d1,#d3').removeClass('hide');
+            var bid=$(this).parent().parent().attr('bid');
+            var hid=$(this).parent().parent().attr('hid');
+            $('#sel').val(bid);
+            $(this).parent().siblings().each(function () {
+                if($(this).attr('name')=='hostname'){
+                    var hostname=$(this).text();
+                    console.log(hostname);
+                    $('.hostname').val(hostname)
+                }else if($(this).attr('name')=='ip'){
+                    var ip=$(this).text();
+                    $('.ip').val(ip)
+                }else if($(this).attr('name')=='port'){
+                    var port=$(this).text();
+                    $('.port').val(port)
+                }
+            });
+            $('.id').val(hid)
+        });
+        $('#ajax_submit_2').click(function () {
+            $.ajax({
+                url:'/test_edit/',
+                type:'POST',
+                data:$('#form_edit').serialize(),
+                success:function (data) {
+{#                    console.log(data);#}
+                    if(data=='ok'){
+                        location.reload()
+                    }
+                }
+            })
+        })
+
+    </script>
+</body>
+</html>

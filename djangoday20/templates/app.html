@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <style>
+        .host{
+            background-color: hotpink;
+            padding: 5px ;
+        }
+        .c2 {
+            padding: 7px 12px;
+            font-size: 12px;
+            border-radius: 3px;
+            display: inline-block;
+            border: 1px solid #dcdfe6;
+            color: #606266;
+            text-align: center;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+         }
+        .c2:hover{
+            background-color: #c6e2ff;
+            color: #409eff;
+        }
+        .c3{
+            padding: 7px 12px;
+            font-size: 12px;
+            border-radius: 3px;
+            display: inline-block;
+            border: 1px solid #f78989;
+            color: white;
+            text-align: center;
+            font-weight: 500;
+            text-decoration: none;
+            background-color: #f66161;
+            cursor: pointer;
+        }
+        .c3:hover{
+            background-color: #f78989;
+        }
+        .add,.edit{
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            height: 200px;
+            width: 250px;
+            margin-left: -50px;
+            margin-top: -100px;
+            z-index: 10;
+            box-shadow: 0 0 15px #FEFEFE;
+            padding:10px;
+            background-color: white;
+
+        }
+        .hide{display: none}
+        .c4{
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            background-color: black;
+            z-index: 9;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="hide c4"></div>
+    <div class="add hide">
+        <form id="from_add">
+        <div><input type="text" name="app_name" ></div>
+        <select name="add_sel" multiple>
+            {% for row in obj2 %}
+            <option value="{{ row.nid }}">{{ row.hostname }}</option>
+            {% endfor %}
+        </select>
+        <input id="ajax_add" type="button" value="Ajax确认添加">
+        <input class="i1" type="button" value="取消">
+        </form>
+    </div>
+
+    <div class="edit hide">
+        <form id="from_edit">
+        <input id="edit_aid" type="text" name="aid" style="display: none" >
+        <div><input id="edit_name" type="text" name="edit_name" ></div>
+        <select name="edit_sel" multiple>
+            {% for row in obj2 %}
+            <option   value="{{ row.nid }}">{{ row.hostname }}</option>
+            {% endfor %}
+        </select>
+        <input id="ajax_edit" type="button" value="Ajax确认编辑">
+        <input class="i1" type="button" value="取消">
+        </form>
+    </div>
+    <h1>应用列表</h1>
+    <input id="i3" type="button" value="添加"/>
+    <table border="1">
+        <thead>
+        <tr>
+            <th>应用名称</th>
+            <th>应用主机列表</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for app in obj %}
+            <tr aid="{{ app.id }}">
+                <td>{{ app.name }}</td>
+                <td>
+                    {% for row2 in  app.r.all %}
+                        <span class="host"  hid="{{ row2.nid }}">{{ row2.hostname }}</span>
+                    {% endfor %}
+                </td>
+                <td>
+                    <a class="c2">编辑</a>
+                    <a class="c3">删除</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script src="/static/jquery-1.12.4.js"></script>
+    <script>
+        $('#ajax_edit').click(function () {
+            $.ajax({
+                url:'/edit/',
+                type:'POST',
+                data:$('#from_edit').serialize(),
+                dataType:'JSON',
+                traditional:true,
+                success:function (obj) {
+                    if(obj.status){
+                        location.reload()
+                    }else {
+                        alert(obj.status)
+                    }
+                },
+                error:function () {
+
+                }
+            })
+        });
+        $('#i3').click(function () {
+            $('.add,.c4').removeClass('hide')
+        });
+        $('#ajax_add').click(function () {
+            $.ajax({
+                url:"/app/",
+                type:'POST',
+                data:$('#from_add').serialize(),
+                dataType:'JSON',
+                traditional:true,
+                success:function (obj) {
+                    if(obj.status){
+                        location.reload()
+                    }else {
+                        alert(obj.status)
+                    }
+                },
+                error:function () {
+
+                }
+            })
+        });
+        $('.c3').click(function () {
+            var aid=$(this).parent().parent().attr('aid');
+            $.ajax({
+                url:"/deleter/",
+                type:'POST',
+                data:{"aid":aid},
+                dataType:'JSON',
+                traditional:true,
+                success:function (obj) {
+                    if(obj.status){
+                        location.reload()
+                    }else {
+                        alert(obj.status)
+                    }
+                },
+                error:function () {
+
+                }
+            })
+        });
+        $('.i1').click(function () {
+            $('.add,.c4,.edit').addClass('hide');
+            $('#from_add,#from_edit').find('input[type="text"]').val('');
+            $('#from_add,#from_edit').find('option').prop('selected',false)
+        });
+        $('.c2').click(function () {
+            var test=$(this).parent().siblings().first().text();
+            var aid=$(this).parent().parent().attr('aid');
+            $('#edit_name').val(test);
+            $('#edit_aid').val(aid);
+            $('.edit,.c4').removeClass('hide');
+            var host_list=[];
+            $(this).parent().prev().children().each(function () {
+                var host_id=$(this).attr('hid');
+                host_list.push(host_id)
+            });
+            $('#from_edit').find('option').each(function () {
+                for(var i in host_list){
+                    if($(this).attr('value')==host_list[i]){
+                        $(this).prop('selected',true)
+                    }
+                }
+            })
+        })
+    </script>
+</body>
+</html>
